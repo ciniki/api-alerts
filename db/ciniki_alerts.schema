@@ -1,0 +1,63 @@
+#
+# Description
+# -----------
+# This table stores the main information for each alert added 
+# to the system.
+#
+# Fields
+# ------
+# id:				The thread ID.
+# business_id:		The business the alert is attached to, and if 
+#					set to zero, then the alert is for all businesses.
+#
+# ref_uid:			The unique reference ID to this alert, as generated
+#					by the calling module.  The ID is used to make sure
+#					duplicate alerts are not opened for the same issue,
+#					instead an incident is added.
+#					
+# status:			The current status of the alert.
+#				
+#					0 - unknown
+#					1 - open
+#					60 - closed
+#					63 - closed permanently, ignore future incidents
+#
+# severity:			0 - unknown
+#					10 - grey, info
+#					20 - green, used for notifications of good things
+#					30 - yellow, warn
+#					40 - orange, caution
+#					50 - red, error, immediate attention
+#
+# flags:			The options for the alert.
+#
+#					0x01 - 
+#					0x02 -
+#					0x04 -
+#					0x08 -
+#					0x10 - 
+#					0x20 -
+#					0x40 -
+#					0x80 -
+#
+# user_id:			The user who created the alert.
+#
+# subject:			The subject for the alert, will be used as email subject and list menus.
+#
+# date_added:		The UTC date and time the thread was added.
+# last_updated:		The UTC date and time the thread was last updated.
+#
+create table ciniki_alerts (
+	id int not null auto_increment,
+	business_id int not null,
+	ref_uid varchar(255) not null,
+	status tinyint unsigned not null,
+	flags tinyint unsigned not null,
+	user_id int not null,
+	subject varchar(140) not null,
+	date_added datetime not null,
+	last_updated datetime not null,
+	primary key (id),
+	unique index (business_id, ref_uid),
+	index (status, date_added)
+) ENGINE='InnoDB', COMMENT='v1.01';

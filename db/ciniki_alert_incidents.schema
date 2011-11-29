@@ -1,0 +1,34 @@
+#
+# Description
+# -----------
+# This table stores the incidents related to an alert.  These 
+# can be any time a health check is run and the status has changed,
+# or status is still red, this is a log.
+#
+# This table is similar to the alert_followups table, but is
+# designated for alert information, not user commentary.
+#
+# Fields
+# ------
+# id:				The unique ID for the incident.
+# alert_id:			The alert the incident is attached to.
+# user_id:			The user who submitted the incident.
+# data:				Any data related to the incident stored as a serialized string.
+# content:			The human readable content or notes for the incident.
+# incident_date:	The UTC date and time the incident occured.
+# date_added:		The UTC date and time the incident was added to the database.
+# last_updated:		The UTC date and time the incident was last updated.
+#
+create table ciniki_alert_incidents (
+	id bigint not null auto_increment,
+	alert_id int not null,
+	user_id int not null,
+	data text,
+	content text,
+	incident_date datetime not null,
+	date_added datetime not null,
+	last_updated datetime not null,
+	primary key(id),
+	index (alert_id, user_id),
+	index (incident_date)
+) ENGINE='InnoDB', COMMENT='v1.01';

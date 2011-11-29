@@ -1,0 +1,45 @@
+#
+# Description
+# -----------
+# The attachments table stores the connections/attachments to other module
+# elements for the alert.  These attachments allow for alerts to hook back
+# to modules and ask for information, or modules to search for open/closed
+# alerts an element of the module.
+#
+# This table was developed as part of the Oasis project.  Attachments can be
+# to a host, aggregate, volume, lun, etc...  The primary flag should be set
+# for the elements that triggered the alert.  If a aggregate is 100% full, then
+# the alert should be attached primary to the aggregate, and secondary to the 
+# host.
+#
+# Fields
+# ------
+# alert_id:				The ID of the alert for the attachment.
+# flags:				Options to set for a alert:
+#
+#						0x01 - primary (not set means secondary)
+#						0x02 - 
+#
+# package:				The package the attachment is to.
+# module:				The module in the package the attachment is to.
+# element:				The element of the module the alert is attached to.
+#						This is a freeform field for modules to use, and 
+#						has no meaning within the alerts module.
+# element_id:			The id of the element the alert is attached to.  This
+#						is a freeform field, which modules can stored 
+#						individual ID's or complex strings if required.
+#
+# date_added:			The date and time the thread was added.
+# last_updated:			The date and time the thread was last updated.
+#
+create table ciniki_alert_attachments (
+	alert_id int not null,
+	flags tinyint unsigned not null,
+	package varchar(100) not null,
+	module varchar(100) not null,
+	element varchar(255) not null,
+	element_id varchar(255) not null,
+	date_added datetime not null,
+	last_updated datetime not null,
+	primary key (alert_id, package, module, element, element_id)
+) ENGINE='InnoDB', COMMENT='v1.01';
