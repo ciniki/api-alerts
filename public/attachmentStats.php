@@ -19,7 +19,7 @@ function ciniki_alerts_attachmentStats($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuoteIDs');
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashIDQuery');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
 	$rc = ciniki_core_prepareArgs($ciniki, 'no', array(
 		'business_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No business specified'), 
 		'package'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No package specified'), 
@@ -46,7 +46,7 @@ function ciniki_alerts_attachmentStats($ciniki) {
 	//
 	// Build the SQL query to count the number of alerts, in different statuses
 	//
-	$strsql = "SELECT status, COUNT(ciniki_alerts.id) AS num_alerts "
+	$strsql = "SELECT status, severity, COUNT(ciniki_alerts.id) AS num_alerts "
 		. "FROM ciniki_alerts, ciniki_alert_attachments "
 		. "WHERE ciniki_alerts.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND ciniki_alerts.id = ciniki_alert_attachments.alert_id "
@@ -61,25 +61,33 @@ function ciniki_alerts_attachmentStats($ciniki) {
 	}
 
 	$strsql .= ""
-		. "GROUP BY ciniki_alerts.status "
+		. "GROUP BY ciniki_alerts.severity, ciniki_alerts.status "
 		. "";
-	$rc = ciniki_core_dbHashIDQuery($ciniki, $strsql, 'core', 'status', 'status');
+	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'core', 'status');
 	if( $rc['stat'] != 'ok' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'486', 'msg'=>'Error retrieving alert information', 'err'=>$rc['err']));
 	}
-	$open = 0;
-	if( isset($rc['status'][1]) ) {
-		$open += $rc['status']['1']['num_alerts'];
-	}
 
-	$closed = 0;
-	if( isset($rc['status'][60]) ) {
-		$closed += $rc['status'][60]['num_alerts'];
+	$open = array('0'=>0, '10'=>0, '20'=>0, '30'=>0, '40'=>0, '50'=>0);
+	$closed = array('0'=>0, '10'=>0, '20'=>0, '30'=>0, '40'=>0, '50'=>0);
+	foreach($rc['rows'] as $snum => $row) {
+		if( $row['status'] == 1 ) { 
+			$open['0'] += $row['num_alerts']; 
+			$open[$row['severity']] += $row['num_alerts'];
+		}
+		if( $row['status'] >= 60 ) { 
+			$closed['0'] += $row['num_alerts']; 
+			$closed[$row['severity']] += $row['num_alerts'];
+		}
 	}
-	if( isset($rc['status'][63]) ) {
-		$closed += $rc['status'][63]['num_alerts'];
-	}
+	$severities = array(
+		array('severity'=>array('severity'=>'50', 'open'=>$open['50'], 'closed'=>$closed['50'])),
+		array('severity'=>array('severity'=>'40', 'open'=>$open['40'], 'closed'=>$closed['40'])),
+		array('severity'=>array('severity'=>'30', 'open'=>$open['30'], 'closed'=>$closed['30'])),
+		array('severity'=>array('severity'=>'20', 'open'=>$open['20'], 'closed'=>$closed['20'])),
+		array('severity'=>array('severity'=>'10', 'open'=>$open['10'], 'closed'=>$closed['10'])),
+		);
 
-	return array('stat'=>'ok', 'open'=>$open, 'closed'=>$closed);
+	return array('stat'=>'ok', 'open'=>$open['0'], 'closed'=>$closed['0'], 'severities'=>$severities);
 }
 ?>

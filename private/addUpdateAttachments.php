@@ -54,14 +54,15 @@ function ciniki_alerts_addUpdateAttachments($ciniki, $alert_id, $attachments) {
 			. "";
 
 		// Check for flags
-		if( isset($alert['type']) && $alert['type'] == 'primary' ) {
+		if( isset($attachment['type']) && $attachment['type'] == 'primary' ) {
 			$flags = 0x01;
 		} else {
 			$flags = 0;
 		}
 		$strsql .= ", '$flags', UTC_TIMESTAMP(), UTC_TIMESTAMP()) "
-			. " ON DUPLICATE KEY UPDATE flags = flags & $flags, last_updated = UTC_TIMESTAMP() "
+			. " ON DUPLICATE KEY UPDATE flags = (flags | $flags), last_updated = UTC_TIMESTAMP() "
 			. "";
+
 		$rc = ciniki_core_dbInsert($ciniki, $strsql, 'ciniki.alerts');
 		if( $rc['stat'] != 'ok' ) {	
 			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'485', 'msg'=>'Invalid alert reference', 'err'=>$rc['err']));
