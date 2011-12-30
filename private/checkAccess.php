@@ -25,19 +25,18 @@ function ciniki_alerts_checkAccess($ciniki, $business_id, $method, $alert_id, $u
 	$strsql = "SELECT business_id, user_id FROM ciniki_business_users "
 		. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
 		. "AND user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
-		. "AND (groups&0x03) > 0 "
+		. "AND package = 'ciniki' "
+		. "AND (permission_group = 'owners' OR permission_group = 'employees') "
 		. "";
 	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'businesses', 'user');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
 	//
-	// Double check business_id and user_id match, for single row returned.
+	// If the user has permission, return ok
 	//
-	if( isset($rc['user']) && isset($rc['user']['business_id']) 
-		&& $rc['user']['business_id'] == $business_id 
-		&& $rc['user']['user_id'] = $ciniki['session']['user']['id'] ) {
-		// Access Granted!
+	if( isset($rc['rows']) && isset($rc['rows'][0]) 
+		&& $rc['rows'][0]['user_id'] > 0 && $rc['rows'][0]['user_id'] == $ciniki['session']['user']['id'] ) {
 		return array('stat'=>'ok');
 	}
 
