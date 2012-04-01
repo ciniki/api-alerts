@@ -33,7 +33,7 @@ function ciniki_alerts_attachmentOpenCount($ciniki, $business_id, $package, $mod
 	//
 	// Build the SQL query to count the number of alerts, in different statuses
 	//
-	$strsql = "SELECT status, COUNT(ciniki_alerts.id) AS num_alerts "
+	$strsql = "SELECT severity, COUNT(ciniki_alerts.id) AS num_alerts "
 		. "FROM ciniki_alerts, ciniki_alert_attachments "
 		. "WHERE ciniki_alerts.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
 		. "AND ciniki_alerts.id = ciniki_alert_attachments.alert_id "
@@ -50,16 +50,29 @@ function ciniki_alerts_attachmentOpenCount($ciniki, $business_id, $package, $mod
 	$strsql .= "AND ciniki_alerts.status = 1 ";
 
 	$strsql .= ""
-		. "GROUP BY ciniki_alerts.status "
+		. "GROUP BY ciniki_alerts.severity "
 		. "";
-	$rc = ciniki_core_dbCount($ciniki, $strsql, 'core', 'status');
+	$rc = ciniki_core_dbCount($ciniki, $strsql, 'core', 'severity');
 	if( $rc['stat'] != 'ok' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'490', 'msg'=>'Error retrieving alert information', 'err'=>$rc['err']));
 	}
-	if( isset($rc['status'][1]) ) {
-		return array('stat'=>'ok', 'open_alerts'=>$rc['status'][1]);
+	$open_alerts = 0;
+	$red_alerts = 0;
+	$yellow_alerts = 0;
+	$green_alerts = 0;
+	if( isset($rc['severity'][50]) ) {
+		$open_alerts += $rc['severity'][50];
+		$red_alerts = $rc['severity'][50];
+	}
+	if( isset($rc['severity'][30]) ) {
+		$open_alerts += $rc['severity'][30];
+		$yellow_alerts = $rc['severity'][30];
+	}
+	if( isset($rc['severity'][10]) ) {
+		$open_alerts += $rc['severity'][10];
+		$green_alerts = $rc['severity'][10];
 	}
 
-	return array('stat'=>'ok', 'open_alerts'=>0);
+	return array('stat'=>'ok', 'open_alerts'=>$open_alerts, 'red_alerts'=>$red_alerts, 'yellow_alerts'=>$yellow_alerts, 'green_alerts'=>$green_alerts);
 }
 ?>
