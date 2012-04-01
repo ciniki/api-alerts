@@ -68,26 +68,36 @@ function ciniki_alerts_attachmentStats($ciniki) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'486', 'msg'=>'Error retrieving alert information', 'err'=>$rc['err']));
 	}
 
-	$open = array('0'=>0, '10'=>0, '20'=>0, '30'=>0, '40'=>0, '50'=>0);
-	$closed = array('0'=>0, '10'=>0, '20'=>0, '30'=>0, '40'=>0, '50'=>0);
+	$open = array('0'=>0, '10'=>0, '30'=>0, '50'=>0);
+	$closed = array('0'=>0, '10'=>0, '30'=>0, '50'=>0);
 	foreach($rc['rows'] as $snum => $row) {
 		if( $row['status'] == 1 ) { 
 			$open['0'] += $row['num_alerts']; 
-			$open[$row['severity']] += $row['num_alerts'];
+			if( $row['severity'] >= 10 && $row['severity'] < 30 ) {
+				$open['10'] += $row['num_alerts'];
+			} else if( $row['severity'] >= 30 && $row['severity'] < 50 ) {
+				$open['30'] += $row['num_alerts'];
+			} else if( $row['severity'] >= 50 ) {
+				$open['50'] += $row['num_alerts'];
+			}
 		}
 		if( $row['status'] >= 60 ) { 
 			$closed['0'] += $row['num_alerts']; 
-			$closed[$row['severity']] += $row['num_alerts'];
+			if( $row['severity'] >= 10 && $row['severity'] < 30 ) {
+				$closed['10'] += $row['num_alerts'];
+			} else if( $row['severity'] >= 30 && $row['severity'] < 50 ) {
+				$closed['30'] += $row['num_alerts'];
+			} else if( $row['severity'] >= 50 ) {
+				$closed['50'] += $row['num_alerts'];
+			}
 		}
 	}
 	$severities = array(
-		array('severity'=>array('severity'=>'50', 'open'=>$open['50'], 'closed'=>$closed['50'])),
-		array('severity'=>array('severity'=>'40', 'open'=>$open['40'], 'closed'=>$closed['40'])),
-		array('severity'=>array('severity'=>'30', 'open'=>$open['30'], 'closed'=>$closed['30'])),
-		array('severity'=>array('severity'=>'20', 'open'=>$open['20'], 'closed'=>$closed['20'])),
-		array('severity'=>array('severity'=>'10', 'open'=>$open['10'], 'closed'=>$closed['10'])),
+		array('red'=>array('severity'=>'50', 'open'=>$open['50'], 'closed'=>$closed['50'])),
+		array('yellow'=>array('severity'=>'30', 'open'=>$open['30'], 'closed'=>$closed['30'])),
+		array('green'=>array('severity'=>'10', 'open'=>$open['10'], 'closed'=>$closed['10'])),
 		);
 
-	return array('stat'=>'ok', 'open'=>$open['0'], 'closed'=>$closed['0'], 'severities'=>$severities);
+	return array('stat'=>'ok', 'open'=>$open['0'], 'closed'=>$closed['0'], 'severities'=>$severities, 'red'=>$open['50'], 'yellow'=>$open['30'], 'green'=>$open['10']);
 }
 ?>
