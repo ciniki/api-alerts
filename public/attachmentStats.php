@@ -54,7 +54,7 @@ function ciniki_alerts_attachmentStats($ciniki) {
 		. "AND ciniki_alert_attachments.module = '" . ciniki_core_dbQuote($ciniki, $args['module']) . "' "
 		. "AND ciniki_alert_attachments.element = '" . ciniki_core_dbQuote($ciniki, $args['element']) . "' "
 		. "";
-	if( isset($args['element_ids']) && is_array($args['element_ids']) ) {
+	if( isset($args['element_ids']) && is_array($args['element_ids']) && count($args['element_ids']) > 0 ) {
 		$strsql .= "AND ciniki_alert_attachments.element_id IN (" . ciniki_core_dbQuoteIDs($ciniki, $args['element_ids']) . ") ";
 	} else {
 		$strsql .= "AND ciniki_alert_attachments.element_id = '" . ciniki_core_dbQuote($ciniki, $args['element_id']) . "' ";
@@ -63,6 +63,7 @@ function ciniki_alerts_attachmentStats($ciniki) {
 	$strsql .= ""
 		. "GROUP BY ciniki_alerts.severity, ciniki_alerts.status "
 		. "";
+	error_log($strsql);
 	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'core', 'status');
 	if( $rc['stat'] != 'ok' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'486', 'msg'=>'Error retrieving alert information', 'err'=>$rc['err']));
