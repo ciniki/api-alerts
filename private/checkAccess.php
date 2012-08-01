@@ -28,7 +28,7 @@ function ciniki_alerts_checkAccess($ciniki, $business_id, $method, $alert_id, $u
 		. "AND package = 'ciniki' "
 		. "AND (permission_group = 'owners' OR permission_group = 'employees') "
 		. "";
-	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'businesses', 'user');
+	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.businesses', 'user');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}

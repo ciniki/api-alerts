@@ -52,7 +52,7 @@ function ciniki_alerts_attachmentOpenCount($ciniki, $business_id, $package, $mod
 	$strsql .= ""
 		. "GROUP BY ciniki_alerts.severity "
 		. "";
-	$rc = ciniki_core_dbCount($ciniki, $strsql, 'core', 'severity');
+	$rc = ciniki_core_dbCount($ciniki, $strsql, 'ciniki.alerts', 'severity');
 	if( $rc['stat'] != 'ok' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'490', 'msg'=>'Error retrieving alert information', 'err'=>$rc['err']));
 	}

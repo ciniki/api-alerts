@@ -53,5 +53,12 @@ function ciniki_alerts__addIncident($ciniki, $alert_id, $incident) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'476', 'msg'=>'Invalid alert reference', 'err'=>$rc['err']));
 	}
 
+	//
+	// Update the last_change date in the business modules
+	// Ignore the result, as we don't want to stop user updates if this fails.
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
+	ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'alerts');
+
 	return array('stat'=>'ok');
 }

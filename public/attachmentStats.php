@@ -63,7 +63,7 @@ function ciniki_alerts_attachmentStats($ciniki) {
 	$strsql .= ""
 		. "GROUP BY ciniki_alerts.severity, ciniki_alerts.status "
 		. "";
-	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'core', 'status');
+	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.alerts', 'status');
 	if( $rc['stat'] != 'ok' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'486', 'msg'=>'Error retrieving alert information', 'err'=>$rc['err']));
 	}
