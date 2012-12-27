@@ -21,16 +21,6 @@ function ciniki_alerts_attachmentOpenCount($ciniki, $business_id, $package, $mod
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbCount');
 
 	//
-	// Make sure this module is activated, and
-	// check permission to run this function for this business
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'alerts', 'private', 'checkAccess');
-	$rc = ciniki_alerts_checkAccess($ciniki, $business_id, 'ciniki.alerts.list', 0, 0);
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	
-	//
 	// Build the SQL query to count the number of alerts, in different statuses
 	//
 	$strsql = "SELECT severity, COUNT(ciniki_alerts.id) AS num_alerts "

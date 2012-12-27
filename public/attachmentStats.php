@@ -38,7 +38,7 @@ function ciniki_alerts_attachmentStats($ciniki) {
 	// check permission to run this function for this business
 	//
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'alerts', 'private', 'checkAccess');
-	$rc = ciniki_alerts_checkAccess($ciniki, $args['business_id'], 'ciniki.alerts.list', 0, 0);
+	$rc = ciniki_alerts_checkAccess($ciniki, $args['business_id'], 'ciniki.alerts.attachmentStats', 0, 0);
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
